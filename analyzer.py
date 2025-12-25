@@ -29,6 +29,24 @@ def parse_log_line(line):
         "user": user,
         "ip": ip
     }
+def detect_bruteforce(parsed_logs, threshold=3):
+    failed_counts = {}
+
+    for log in parsed_logs:
+        if log["event"] == "failed_login":
+            ip = log["ip"]
+            failed_counts[ip] = failed_counts.get(ip, 0) + 1
+
+    alerts = []
+    for ip, count in failed_counts.items():
+        if count >= threshold:
+            alerts.append({
+                "ip": ip,
+                "failed_attempts": count
+            })
+
+    return alerts
+
 
 
 def main():
@@ -42,6 +60,19 @@ def main():
     print("Parsed logs:")
     for entry in parsed_logs:
         print(entry)
+
+    alerts = detect_bruteforce(parsed_logs)
+
+    print("\nSecurity alerts:")
+    if not alerts:
+        print("No suspicious activity detected.")
+    else:
+        for alert in alerts:
+            print(
+                f"ALERT: Possible brute-force attack from {alert['ip']} "
+                f"({alert['failed_attempts']} failed attempts)"
+            )
+
 
 
 if __name__ == "__main__":
