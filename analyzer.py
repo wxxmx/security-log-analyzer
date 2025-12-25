@@ -1,3 +1,5 @@
+from datetime import datetime
+
 def load_logs(file_path):
     with open(file_path, "r") as file:
         return file.readlines()
@@ -6,8 +8,11 @@ def load_logs(file_path):
 def parse_log_line(line):
     parts = line.strip().split()
 
-    timestamp = f"{parts[0]} {parts[1]}"
+    timestamp_str = f"{parts[0]} {parts[1]}"
+    timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
     level = parts[2]
+
+    
 
     if "Failed login attempt" in line:
         event = "failed_login"
@@ -47,6 +52,34 @@ def detect_bruteforce(parsed_logs, threshold=3):
 
     return alerts
 
+def detect_bruteforce_time_window(parsed_logs, threshold=3, window_seconds=30):
+    failed_by_ip = {}
+
+    for log in parsed_logs:
+        if log["event"] == "failed_login":
+            ip = log["ip"]
+            failed_by_ip.setdefault(ip, []).append(log["timestamp"])
+
+    alerts = []
+
+    for ip, timestamps in failed_by_ip.items():
+        timestamps.sort()
+
+        for i in range(len(timestamps) - threshold + 1):
+            start = timestamps[i]
+            end = timestamps[i + threshold - 1]
+
+            if (end - start).total_seconds() <= window_seconds:
+                alerts.append({
+                    "ip": ip,
+                    "failed_attempts": threshold,
+                    "time_window": window_seconds
+                })
+                break
+
+    return alerts
+
+
 
 
 def main():
@@ -61,17 +94,19 @@ def main():
     for entry in parsed_logs:
         print(entry)
 
-    alerts = detect_bruteforce(parsed_logs)
+        alerts = detect_bruteforce_time_window(parsed_logs)
 
-    print("\nSecurity alerts:")
+    print("\nTime-based security alerts:")
     if not alerts:
         print("No suspicious activity detected.")
     else:
         for alert in alerts:
             print(
                 f"ALERT: Possible brute-force attack from {alert['ip']} "
-                f"({alert['failed_attempts']} failed attempts)"
+                f"({alert['failed_attempts']} failed attempts within "
+                f"{alert['time_window']} seconds)"
             )
+
 
 
 
