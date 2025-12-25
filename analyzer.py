@@ -87,24 +87,22 @@ def main():
 
     parsed_logs = []
     for log in logs:
-        parsed = parse_log_line(log)
-        parsed_logs.append(parsed)
+        parsed_logs.append(parse_log_line(log))
 
-    print("Parsed logs:")
-    for entry in parsed_logs:
-        print(entry)
+    alerts = detect_bruteforce_time_window(parsed_logs)
 
-        alerts = detect_bruteforce_time_window(parsed_logs)
+    print("=== Security Log Analyzer ===")
 
-    print("\nTime-based security alerts:")
     if not alerts:
         print("No suspicious activity detected.")
     else:
+        print("\nSecurity Alerts:")
         for alert in alerts:
             print(
-                f"ALERT: Possible brute-force attack from {alert['ip']} "
-                f"({alert['failed_attempts']} failed attempts within "
-                f"{alert['time_window']} seconds)"
+                f"- Possible brute-force attack detected\n"
+                f"  Source IP: {alert['ip']}\n"
+                f"  Failed Attempts: {alert['failed_attempts']}\n"
+                f"  Time Window: {alert['time_window']} seconds\n"
             )
 
 
