@@ -1,0 +1,9 @@
+2025-01-10 10:15:32 INFO User walid logged in from 192.168.1.10
+2025-01-10 10:16:01 WARNING Failed login attempt for user admin from 192.168.1.15
+2025-01-10 10:16:05 WARNING Failed login attempt for user admin from 192.168.1.15
+2025-01-10 10:16:10 WARNING Failed login attempt for user admin from 192.168.1.15
+2025-01-10 10:16:45 INFO User walid logged in from 192.168.1.10
+2025-01-10 10:18:02 WARNING Failed login attempt for user root from 10.0.0.23
+2025-01-10 10:18:08 WARNING Failed login attempt for user root from 10.0.0.23
+2025-01-10 10:18:15 WARNING Failed login attempt for user root from 10.0.0.23
+2025-01-10 10:20:00 INFO User alice logged in from 172.16.0.5
